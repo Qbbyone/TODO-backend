@@ -32,7 +32,7 @@ class TagsController {
       // get notes
       const noteList = await noteService
         .getNotesByUserId(userId)
-        .then((noteList) => noteList.map((note) => noteDto(note)));
+        .then((noteList) => noteList.map((note) => noteDto(note, JSON.parse(JSON.stringify(tagList)))));
 
       if (!tagList || !noteList) {
         throw new Error("Server Error");
@@ -43,23 +43,47 @@ class TagsController {
     }
   }
 
+  async changeTagStatus(req, res) {
+    try {
+      const tagId = req.query.id
+      const tag = await tagService.getTagById(tagId)
+      const userId = tag.user_id
+     
+      await tagService.changeTagStatus(tagId, !tag.is_active)
+
+      //* Sorting 
+
+      // get tags
+      let tagList = await tagService
+        .getTagsByUserId(userId)
+        .then((tagList) => tagList.map((tag) => tagDto(tag)));
+      
+        // get notes
+      const noteList = await noteService
+        .getNotesByUserId(userId)
+        .then((noteList) => noteList.map((note) => noteDto(note, JSON.parse(JSON.stringify(tagList)))));
+      res.json({ tagList, noteList });
+  
+    } catch (e) {
+      console.log("CHANGE TAG STATUS ERROR", e);
+      res.status(500).json(e);
+    }
+  }
+
   async deleteTag(req, res) {
     try {
       const tagId = req.query.id
-     
-      const userId = await tagService.getTagById(tagId)
-
+      const tag = await tagService.getTagById(tagId)
+      const userId = tag.user_id
       await tagService.deleteTag(tagId)
 
-      // get tags
       const tagList = await tagService
         .getTagsByUserId(userId)
         .then((tagList) => tagList.map((tag) => tagDto(tag)));
 
-      // get notes
       const noteList = await noteService
         .getNotesByUserId(userId)
-        .then((noteList) => noteList.map((note) => noteDto(note)));
+        .then((noteList) => noteList.map((note) => noteDto(note, JSON.parse(JSON.stringify(tagList)))));
 
       res.json({ tagList, noteList });
     } catch (e) {

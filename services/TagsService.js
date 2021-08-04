@@ -11,11 +11,15 @@ class TagsService {
 
   async getTagById(tagId) {
     const tag = await models.Tag.findByPk(tagId)
-    return tag.user_id
+    return tag
   }
 
   async getTagsByUserId(userId) {
     return await models.Tag.findAll({ where: { user_id: userId }, raw: true });
+  }
+
+  async changeTagStatus(tagId, tagStatus) {
+    return await models.Tag.update({is_active: tagStatus}, { where: { tag_id: tagId }})
   }
 
   async deleteTag(tagId) {
