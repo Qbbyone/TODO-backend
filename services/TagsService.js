@@ -10,20 +10,27 @@ class TagsService {
   }
 
   async getTagById(tagId) {
-    const tag = await models.Tag.findByPk(tagId)
-    return tag
+    const tag = await models.Tag.findByPk(tagId);
+    return tag;
   }
 
   async getTagsByUserId(userId) {
-    return await models.Tag.findAll({ where: { user_id: userId }, raw: true });
+    return await models.Tag.findAll({
+      where: { user_id: userId },
+      raw: true,
+      order: [["tag_id", "ASC"]],
+    });
   }
 
   async changeTagStatus(tagId, tagStatus) {
-    return await models.Tag.update({is_active: tagStatus}, { where: { tag_id: tagId }})
+    return await models.Tag.update(
+      { is_active: tagStatus },
+      { where: { tag_id: tagId } }
+    );
   }
 
   async deleteTag(tagId) {
-    return await models.Tag.destroy({ where: { tag_id: tagId } })
+    return await models.Tag.destroy({ where: { tag_id: tagId } });
   }
 }
 
