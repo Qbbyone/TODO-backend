@@ -1,4 +1,5 @@
 const userService = require("../services/UserService");
+const noteService = require("../services/NotesService")
 const getData = require("../data");
 
 class NotesController {
@@ -9,6 +10,25 @@ class NotesController {
       res.json(noteList);
     } catch (e) {
       console.log("NOTELIST ERROR", e);
+      res.status(500).json(e);
+    }
+  }
+
+  async addNote(req, res) {
+    try {
+      const { title, description, userToken, isPinned, activeTagsArray } = req.body;
+      const userId = await userService.getUserIdByToken(userToken);
+      
+      await noteService.addNote(title, description, isPinned, activeTagsArray, userId);
+
+      const [tagList, noteList] = await getData(userId)
+
+      if (!tagList || !noteList) {
+        throw new Error("Server Error");
+      }
+      res.json({ tagList, noteList });
+    } catch (e) {
+      console.log("ADD NOTELIST ERROR", e);
       res.status(500).json(e);
     }
   }

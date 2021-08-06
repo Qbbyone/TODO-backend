@@ -1,8 +1,6 @@
 const tagService = require("../services/TagsService");
-const noteService = require("../services/NotesService");
 const userService = require("../services/UserService");
 const tagDto = require("../dto/tag.dto");
-const noteDto = require("../dto/note.dto");
 const getData = require("../data");
 
 class TagsController {
@@ -21,6 +19,7 @@ class TagsController {
 
   async addTag(req, res) {
     try {
+      console.log("req.body TAG", req.body);
       const { name, isActive, userToken } = req.body;
       const userId = await userService.getUserIdByToken(userToken);
       await tagService.addTag(name, isActive, userId);

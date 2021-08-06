@@ -5,4 +5,6 @@ const notesRouter = new Router();
 
 notesRouter.get("/loadNoteList", NotesController.loadNoteList)
 
+notesRouter.post("/addNote", NotesController.addNote)
+
 module.exports = notesRouter;
