@@ -7,4 +7,6 @@ notesRouter.get("/loadNoteList", NotesController.loadNoteList)
 
 notesRouter.post("/addNote", NotesController.addNote)
 
-module.exports = notesRouter;
+notesRouter.get("/deleteNote", NotesController.deleteNote)
+
+module.exports = notesRouter; 

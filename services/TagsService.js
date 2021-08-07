@@ -10,8 +10,7 @@ class TagsService {
   }
 
   async getTagById(tagId) {
-    const tag = await models.Tag.findByPk(tagId);
-    return tag;
+    return await models.Tag.findByPk(tagId);
   }
 
   async getTagsByUserId(userId) {
