@@ -1,6 +1,7 @@
 function convertToDto(note, tagList) {
   const tagsArray = checkTagStatus(tagList, note.note_tags);
-  return {
+ 
+  return {  
     id: note.note_id,
     title: note.title,
     description: note.description,
@@ -11,16 +12,14 @@ function convertToDto(note, tagList) {
 
 function checkTagStatus(tagList, activeTagsArray) {
   for (let i in tagList) {
-    for (let j in activeTagsArray) {
-      if (tagList[i].id === activeTagsArray[j]) {
+    if(activeTagsArray.includes(tagList[i].id)) {
         tagList[i].isActive = true
       } else {
         tagList[i].isActive = false
-      }
+      } 
     }
-  }
-  return tagList;
   
+  return tagList;
 }
 
 module.exports = convertToDto;

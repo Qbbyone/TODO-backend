@@ -15,12 +15,14 @@ async function getData(userId) {
   
   const notes = await noteService
     .getNotesByUserId(userId)
-    .then((notes) =>
+    .then((notes) => 
       notes
+        .sort(function(a,b){return a.is_pinned-b.is_pinned})
+        .reverse() 
         .filter(
           (note) =>
             !activeTags.length ||
-            note.note_tags.some((el) => activeTags.includes(el))
+            note.note_tags.some((el) => activeTags.includes(el)) || note.is_pinned
         )
         .map((note) => noteDto(note, JSON.parse(JSON.stringify(tags))))
     );
