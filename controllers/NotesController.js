@@ -33,16 +33,50 @@ class NotesController {
     }
   }
 
+  async editNote(req, res) {
+    try {
+      const { title, description, isPinned, userToken, activeTagsArray, id } = req.body;
+      const userId = await userService.getUserIdByToken(userToken);
+   
+      await noteService.editNote(title, description, isPinned, activeTagsArray, id)
+
+      const [tagList, noteList] = await getData(userId)
+  
+      if (!tagList || !noteList) {
+        throw new Error("Server Error");
+      }
+      res.json({ tagList, noteList });
+
+    } catch (e) {
+      console.log("EDIT NOTE ERROR", e);
+      res.status(500).json(e);
+    }
+  }
+
+  async pinNote(req, res) {
+    try {
+      const noteId = req.query.id
+      const note = await noteService.getNoteById(noteId)
+      const userId = note.user_id;
+      await noteService.pinNote(noteId, !note.is_pinned)
+      const [tagList, noteList] = await getData(userId)
+      res.json({ tagList, noteList });
+    } catch (e) {
+      console.log("PIN NOTE ERROR", e);
+      res.status(500).json(e);
+    }
+  }
+
   async deleteNote(req, res) {
     try {
       const noteId = req.query.id
       const note = await noteService.getNoteById(noteId)
       const userId = note.user_id;
-      await noteService.deleteNote(userId)
+      await noteService.deleteNote(noteId)
       const [tagList, noteList] = await getData(userId)
       res.json({ tagList, noteList });
     } catch (e) {
-      console.log("DELETE NOTELIST ERROR", e);
+      console.log("DELETE NOTE ERROR", e);
       res.status(500).json(e);
     }
   }

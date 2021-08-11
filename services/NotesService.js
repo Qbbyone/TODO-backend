@@ -2,7 +2,11 @@ const models = require("../database");
 
 class NoteService {
   async getNotesByUserId(userId) {
-    return await models.Note.findAll({ where: { user_id: userId }, raw: true });
+    return await models.Note.findAll({
+      where: { user_id: userId },
+      raw: true,
+      order: [["note_id", "ASC"]],
+    });
   }
 
   async getNoteById(noteId) {
@@ -17,6 +21,25 @@ class NoteService {
       note_tags: activeTagsArray,
       user_id: userId,
     });
+  }
+
+  async editNote(title, description, isPinned, activeTagsArray, noteId) {
+    return await models.Note.update(
+      {
+        title: title,
+        description: description,
+        is_pinned: isPinned,
+        note_tags: activeTagsArray,
+      },
+      { where: { note_id: noteId } }
+    );
+  }
+
+  async pinNote(noteId, noteStatus) {
+    return await models.Note.update(
+      { is_pinned: noteStatus },
+      { where: { note_id: noteId } }
+    );
   }
 
   async deleteNote(noteId) {
