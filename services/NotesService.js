@@ -1,9 +1,27 @@
 const models = require("../database");
 
 class NoteService {
-  async getNotesByUserId(userId) {
+  async getNotesByUserId(userId, searchQuery) {
+    let searchQueryValue = searchQuery.toLowerCase();
+    const { Op } = require("sequelize");
+
     return await models.Note.findAll({
-      where: { user_id: userId },
+      where: {
+        user_id: userId,
+        [Op.or]: [
+          { is_pinned: true },
+          {
+            title: {
+              [Op.like]: "%" + searchQueryValue + "%",
+            },
+          },
+          {
+            description: {
+              [Op.like]: "%" + searchQueryValue + "%",
+            },
+          },
+        ],
+      },
       raw: true,
       order: [["note_id", "ASC"]],
     });

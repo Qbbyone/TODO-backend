@@ -3,10 +3,11 @@ const noteService = require("./services/NotesService");
 const tagDto = require("./dto/tag.dto");
 const noteDto = require("./dto/note.dto");
 
-async function getData(userId) {
-  const activeTags = [];
+async function getData(userId, searchQuery) {
+  
+  const activeTags = [];  
 
-  const tags = await tagService.getTagsByUserId(userId).then((tags) =>
+  const tags = await tagService.getTagsByUserId(userId, searchQuery).then((tags) =>
     tags.map((tag) => {
       if (tag.is_active) activeTags.push(tag.tag_id);
       return tagDto(tag);
@@ -14,7 +15,7 @@ async function getData(userId) {
   );
   
   const notes = await noteService
-    .getNotesByUserId(userId)
+    .getNotesByUserId(userId, searchQuery)
     .then((notes) => 
       notes
         .sort(function(a,b){return a.is_pinned-b.is_pinned})

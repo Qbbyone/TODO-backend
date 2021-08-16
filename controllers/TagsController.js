@@ -19,12 +19,12 @@ class TagsController {
 
   async addTag(req, res) {
     try {
-      console.log("req.body TAG", req.body);
       const { name, isActive, userToken } = req.body;
+      const searchQuery =  req.query.searchQuery
       const userId = await userService.getUserIdByToken(userToken);
       await tagService.addTag(name, isActive, userId);
 
-      const [tagList, noteList] = await getData(userId)
+      const [tagList, noteList] = await getData(userId, searchQuery)
 
       if (!tagList || !noteList) {
         throw new Error("Server Error");
@@ -39,12 +39,13 @@ class TagsController {
   async changeTagStatus(req, res) {
     try {
       const tagId = req.query.id;
+      const searchQuery =  req.query.searchQuery
       const tag = await tagService.getTagById(tagId);
       const userId = tag.user_id;
 
       await tagService.changeTagStatus(tagId, !tag.is_active);
 
-      const [tagList, noteList] = await getData(userId)
+      const [tagList, noteList] = await getData(userId, searchQuery)
 
       res.json({ tagList, noteList });
     } catch (e) {
@@ -56,11 +57,12 @@ class TagsController {
   async deleteTag(req, res) {
     try {
       const tagId = req.query.id;
+      const searchQuery =  req.query.searchQuery
       const tag = await tagService.getTagById(tagId);
       const userId = tag.user_id;
       await tagService.deleteTag(tagId);
 
-      const [tagList, noteList] = await getData(userId)
+      const [tagList, noteList] = await getData(userId, searchQuery)
 
       res.json({ tagList, noteList });
     } catch (e) {
