@@ -6,7 +6,8 @@ class NotesController {
   async loadNoteList(req, res) {
     try {
       const userId = await userService.getUserIdByToken(req.query.token);
-      const [tagList, noteList] = await getData(userId);
+      const searchQuery =  req.query.searchQuery
+      const [tagList, noteList] = await getData(userId, searchQuery);
       res.json(noteList);
     } catch (e) {
       console.log("NOTELIST ERROR", e);
@@ -17,16 +18,17 @@ class NotesController {
   async addNote(req, res) {
     try {
       const { title, description, userToken, isPinned, activeTagsArray } = req.body;
+      const searchQuery =  req.query.searchQuery
       const userId = await userService.getUserIdByToken(userToken);
       
       await noteService.addNote(title, description, isPinned, activeTagsArray, userId);
 
-      const [tagList, noteList] = await getData(userId)
+      const [tagList, noteList] = await getData(userId, searchQuery)
 
       if (!tagList || !noteList) {
         throw new Error("Server Error");
       }
-      res.json({ tagList, noteList });
+      res.json(noteList);
     } catch (e) {
       console.log("ADD NOTELIST ERROR", e);
       res.status(500).json(e);
@@ -36,16 +38,17 @@ class NotesController {
   async editNote(req, res) {
     try {
       const { title, description, isPinned, userToken, activeTagsArray, id } = req.body;
+      const searchQuery =  req.query.searchQuery
       const userId = await userService.getUserIdByToken(userToken);
    
       await noteService.editNote(title, description, isPinned, activeTagsArray, id)
 
-      const [tagList, noteList] = await getData(userId)
+      const [tagList, noteList] = await getData(userId, searchQuery)
   
       if (!tagList || !noteList) {
         throw new Error("Server Error");
       }
-      res.json({ tagList, noteList });
+      res.json(noteList);
 
     } catch (e) {
       console.log("EDIT NOTE ERROR", e);
@@ -56,11 +59,12 @@ class NotesController {
   async pinNote(req, res) {
     try {
       const noteId = req.query.id
+      const searchQuery =  req.query.searchQuery
       const note = await noteService.getNoteById(noteId)
       const userId = note.user_id;
       await noteService.pinNote(noteId, !note.is_pinned)
-      const [tagList, noteList] = await getData(userId)
-      res.json({ tagList, noteList });
+      const [tagList, noteList] = await getData(userId, searchQuery)
+      res.json(noteList);
     } catch (e) {
       console.log("PIN NOTE ERROR", e);
       res.status(500).json(e);
@@ -70,13 +74,26 @@ class NotesController {
   async deleteNote(req, res) {
     try {
       const noteId = req.query.id
+      const searchQuery =  req.query.searchQuery
       const note = await noteService.getNoteById(noteId)
       const userId = note.user_id;
       await noteService.deleteNote(noteId)
-      const [tagList, noteList] = await getData(userId)
-      res.json({ tagList, noteList });
+      const [tagList, noteList] = await getData(userId, searchQuery)
+      res.json(noteList);
     } catch (e) {
       console.log("DELETE NOTE ERROR", e);
+      res.status(500).json(e);
+    }
+  }
+
+  async searchNote(req, res) {
+    try {
+      const userId = await userService.getUserIdByToken(req.query.token);
+      const searchQuery =  req.query.searchQuery
+      const [tagList, noteList] = await getData(userId, searchQuery)
+      res.json(noteList);
+    } catch (e) {
+      console.log("SEARCH NOTE ERROR", e);
       res.status(500).json(e);
     }
   }

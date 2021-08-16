@@ -13,4 +13,6 @@ notesRouter.get("/pinNote", NotesController.pinNote)
 
 notesRouter.get("/deleteNote", NotesController.deleteNote)
 
-module.exports = notesRouter; 
+notesRouter.get("/searchNote", NotesController.searchNote)
+ 
+module.exports = notesRouter;      
